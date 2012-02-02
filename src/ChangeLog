@@ -1,0 +1,242 @@
+
+--------------------------------------------------------------------------------
+WHAT'S NEW?
+--------------------------------------------------------------------------------
+
+v1.29 <- v1.28
+ * Reduced CPU consumption.
+ * Prevented CZ80 from crashing when handling invalid code.
+ * OpenGL: added configuration option to force square textures.
+ * OpenGL: fixed non-power of two texture size issue from v1.28.
+ * Fixed save files to manage YM2612 timers properly.
+ * Fixed the way files are opened relative to DGen's home directory.
+ * YM2612 timers are now managed externally by DGen.
+ * Removed unused support for M68KEM.
+ * Refactored memory handling, frame generation and initialization routines.
+   As a side effect, DGen can run more games now.
+ * Fixed remaining bugs in Z80 and M68K hot swapping code.
+ * Updated AUTHORS file.
+ * Added BUGS file for unresolved emulation bugs.
+ * Imported hqx filters. hq2x is available for 15/16 and 32 bit, hq3x and
+   hq4x are only available for 32 bit modes.
+ * Refactored graphics output functions. Filtering and scaling are now
+   in separate functions and new filters can be added easily.
+ * Improved joystick devices configuration.
+ * Fixed ASM files to ensure non-executable stack on ELF targets.
+ * Merged OpenGL and normal fonts to remove redundant code. There are now
+   three fonts available: 7x5 (original OpenGL font), 8x13 and 16x26.
+ * Fixed other minor bugs.
+
+v1.28 <- v1.27
+ * ROM loader can now use libarchive when available for decompression. This
+   replaces the previous system()-based implementation.
+ * "tobin" has been renamed "dgen_tobin" and no longer has dependencies on
+   SDL and other unnecessary libraries.
+ * CZ80: fixed emulation bug ("weird sound") introduced just before the 1.27
+   release.
+ * Improved CZ80/MZ80 switching.
+ * Improved save file handling. Z80 context and other important things are now
+   stored. The format is mostly compatible with Gens v5 and save states can be
+   exchanged between both emulators. Old save files are still supported.
+ * YM2612: upgraded from version 0.35f to 1.4b, as found in Final Burn Alpha.
+   Sound quality has improved as a result.
+ * Improved sound buffer management again, a single buffer is now used with
+   both channels instead of two separate buffers.
+ * Removed 8-bit sound output format since it was useless and annoying to
+   support with the new buffer.
+ * Removed superfluous window resizing messages.
+ * Game Genie codes can now be entered while in stopped mode to avoid crashes
+   when more than one is needed at once. Also, DGen now supports RAM patching.
+ * Corrected clock frequencies for YM2612 and SN76496, sound is pitched a bit
+   higher than before.
+ * Added region selection command-line option. This option reuses "-R"
+   (realtime priority). In case this option isn't given, the default region
+   used by DGen is now the first found in the ROM header. This option has no
+   effect on PAL (50Hz) mode which needs to be enabled separately.
+ * OpenGL: a single OpenGL texture (and subtexture) is now used instead of two
+   smaller ones, thus removing some of the complexity.
+ * Usual batch of miscellaneous bugfixes.
+
+v1.27 <- v1.26
+ * Documentation clean-up, sample.dgenrc update.
+ * Compilation fixes for MZ80.
+ * When both Musashi and StarScream are available, default to Musashi since
+   it provides better emulation.
+ * Imported CZ80 0.91. This Z80 emulator is pure C and works better than the C
+   version of MZ80. This means that on non-x86/32 bit hardware, games that
+   previously didn't have sound now work properly (Sonic 2 for instance).
+   Thanks to DGen PSP which implemented CZ80 first.
+ * Modified CZ80 to work properly on big-endian machines.
+ * When both CZ80 and MZ80 are available, CZ80 is now the default.
+ * DGen can now be compiled without any external modules. MZ80, CZ80, Musashi
+   and StarScream can all be disabled.
+ * There's now a toggle key (F10 by default) to switch between MZ80, CZ80 or
+   neither.
+ * The Musashi/StarScream toggle key can now disable them both.
+ * New rc variables for selecting default emulators.
+ * FPS are now calculated every second for a more accurate message at exit.
+ * Implemented bool_show_carthead.
+ * Game Genie codes can now be entered interactively by pressing F9. They can
+   also be disabled by re-entering them.
+ * Various other fixes.
+
+v1.26 <- v1.25
+ * Upgraded Musashi from 2.0 to 3.3.1. This version solves various emulation
+   problems.
+ * Reworked autoconf and automake scripts to improve readability and
+   portability.
+ * Added support for MinGW. DGen can now run in Windows.
+ * Fixed messy border again, this time for all video color depths.
+ * OpenGL: added bool_opengl_aspect to keep the original aspect ratio during
+   resizing. This option is enabled by default.
+ * Added support for 24 bpp (3 Bpp) mode.
+ * Made Crap TV filters available for all architectures, color depths and
+   OpenGL.
+ * OpenGL: fixed GL_LINEAR support so it can be used again instead of
+   GL_NEAREST, one can switch between them with bool_opengl_linear
+   (enabled by default).
+ * Refactored the main loop and SDL code for a smooth frame rate with an
+   improved sound synchronization.
+ * Made a wrapper to open and create files relative to user's home directory
+   in a system-independant manner.
+ * Fixed Z80 speed in NTSC mode, sound effects were abnormally high pitched.
+ * Improved FPS counter.
+ * Removed SIGALRM for improved portability.
+ * OpenGL: now enabled by default when available.
+ * MZ80: fixed segfault on reset.
+ * OpenGL: use 16 bpp mode internally instead of 32, allow textures to be 16
+   (default) or 32 bit with bool_opengl_32bit.
+ * OpenGL: added bool_opengl_swap to byte-swap colors when the host computer
+   endianness is not the same as the ouptut (possible with X11 sessions).
+ * Screenshots are now generated from the internal video buffer as TARGA files
+   so they are available in all modes (OpenGL or not) and depths (except 8 bpp,
+   as usual). Their output directory is ~/.dgen/screenshots.
+ * OpenGL: the message bar now spans both textures.
+ * Improved stopped mode to be less easily unstopped and to avoid dropping
+   frames. Also, it now accepts resizes and refreshes.
+ * Added the -H option to tweak emulation speed. Can be used to run 50Hz games
+   at 60Hz.
+
+v1.25 <- v1.24
+ * Added 64 bits targets support, DGen can now run on those.
+ * Minor fix for joystick/joypad when sizeof(int) != sizeof(long).
+ * Fixed messy border issue (garbage on the right of the screen).
+ * OpenGL: worked around the vertical dark line between textures.
+ * OpenGL: the visible area now takes the entire window (except for the
+   status line). No more borders.
+ * OpenGL: the window can now be resized/rescaled at runtime.
+ * Fixed bug in which SDL-specific fields in dgenrc were not taken into
+   account when no command-line option was given.
+ * Replaced dgenrc parser with a better one. It breaks compatibility a
+   little with the previous version because special characters now need to
+   be escaped or put between quotation marks.
+ * Improved configure and Makefiles for proper SDL/OpenGL detection,
+   better dependencies in parallel builds, NASM's presence on x86 targets
+   which shouldn't be mandatory and various other things.
+ * Fixed many crashes.
+ * Removed many compilation warnings.
+
+v1.24 <- v1.23
+ * Fixed compilation on GCC 4.
+
+v1.23 <- v1.22
+ * Added fullscreen toggle, using Alt-Enter by default.
+ * Added the ability to set modifiers on key bindings, using the prefixes
+   "shift-", "ctrl-", "alt-", and "meta-".
+ * When 'z' is pressed to stop emulation while running fullscreen, the screen
+   is toggled into windowed mode until emulation resumes. (assuming SDL
+   supports this on your platform)
+ * Fixed some buffer overflows in the rc parser.
+ - Fixed a minor bug in creating the .dgen directory framework upon first run.
+ * NASM is now required on x86 platforms.
+ - Fixed a possible problem in the configure script detecting NASM object
+   format on non-ELF platforms.
+
+v1.22 <- v1.21
+ * Fixed save RAM problems with some games that did not properly switch save
+   RAM on/off, such as Shadowrun and Shining Force.
+ * Fixed SDL joystick code, thanks to Cameron Moore <cameron@unbeatenpath.net>.
+ * Fixed timing problems on FreeBSD and on very fast machines when playing with
+   sound. If you use FreeBSD, I suggest updating to the latest 4-STABLE
+   snapshot and rebuilding your kernel to get the best sound sync.
+ * Added OpenGL rendering mode, thanks to Andre Souza <asouza@olinux.com.br>.
+   See the '-G' option in the dgen(1) manpage or 'bool_opengl' in dgenrc(5)
+   in order to activate it.
+ * Added 'bool_fullscreen', 'int_scale', 'bool_opengl', 'int_opengl_width',
+   and 'int_opengl_height' dgenrc fields, in order to allow fullscreen,
+   scaling, and OpenGL preferences to be set permanently in dgenrc.
+
+v1.21 <- v1.20a
+ * Screenshot code added, courtesy of Allen Noe <psyclone42@geocities.com>.
+   The key_screenshot field in dgenrc sets the key that will make screenshots
+   happen. Its default is F12.
+ * MZ80 core updated to version 3.4. Sound in Aladdin and the Sonic games should
+   run at the correct speed now.
+ * Fixed a bug in the handling of handling saved state and RAM filenames, which
+   would result in saved state files being saved with a null filename.
+ - Added a '-s' switch, which will load the given saved state at startup.
+ * Added support for joystick through SDL for SDL 1.1.x.
+ - Fixed compilation problems with the gcc "2.96" on Redhat 7.x systems. Thanks
+   to Jeff Grady <jgrady@chimera.acm.jhu.edu>.
+
+v1.20a <- 1.20
+ - Fixed a tiny problem that caused MMX to be improperly detected on some Linux
+   boxes.
+
+v1.20 <- 1.18
+ * DGen now uses autoconf/automake, so compiling DGen is now as easy as
+   './configure && make && make install'.
+   Because of this, though, you'll need to upgrade SDL to v1.0.1.
+   The new Autoconf scripts are still a bit experimental; if it seems broken
+   on your platform, try to fix it and send a patch.
+ - I rewrote and reorganized documentation to better fit the way Automake likes
+   to do things.
+ * Manpages are now available, for dgen(1) and dgenrc(5).
+ * If the normal window size is too small for you, you can now scale the window
+   with the new -X and -Y options.
+
+v1.19 <- v1.18
+ - $%&($! Nothing was working!
+
+v1.18 <- v1.17
+ * Enormous speed increase, thanks to the hard work of John Stiles, who also
+   has put all interrupt bugs to rest, finally.
+ * DGen works in FreeBSD! The included Makefile.config.FreeBSD should work
+   without modifications. You need the GNU make and EGCS ports, though.
+ * Demo record/play! You can record a demo of yourself playing a game with the
+   '-d DEMONAME' switch, i.e. "dgen -d foo.demo my_rom.smd". Then play it back
+   later with "dgen -D foo.demo my_rom.smd". Also, no verifaction checks are
+   done on the demos, so you can feed it arbitrary files and see what happens,
+   if you like. :)
+
+v1.17 <- v1.16
+ * Save RAM implementation has been overhauled, so now games with overlapping
+   ROM and save RAM (like Phantasy Star IV and Sonic 3 + Knuckles) can save
+   games correctly. Many thanks to Steve Snake for helping me make this work
+   right.
+ * Crude PAL mode support, give the '-P' option to use it. Doesn't work very
+   well yet.
+ - I made some changes that should (hopefully) make DGen run properly on
+   big-endian platforms, but I don't have any way of testing it. If you have
+   a PowerPC, SPARC, or other big-endian system, give it a try and help me
+   iron out the wrinkles. :)
+ * Window is now emulated properly, so Herzog Zwei split-screen and other
+   little bugs should be fixed. Thanks again to Steve.
+ - A little bug that caused SDL to complain about not being able to
+   initialize sound, even if bool_sound was false in dgenrc, was fixed. This
+   should help all you folks without sound cards.
+ * Assembler tile rendering is now in place for the new raster effect engine.
+   A small but noticeable speed increase. :) [PKH]
+ * All the SDL-dependent stuff has been separated into the sdl/ directory,
+   and I wrote a little platform-dependent (pd) API so you can attach an
+   interface for your favorite Unix-like operating system and toolkit. :)
+   If you want to do a port to BeOS, MacOS X, QNX, etc. this should make your
+   life easier. I also hope to have raw Xlib and SVGAlib interfaces to replace
+   SDL, and thus require one less thing to download. :)
+ - Improved sound writing method, by Daniel Wislocki <wislocki@math.grin.edu>.
+   He says this improves flaky sound in 44kHz, and also fixes the problem of
+   the emulator being too fast. I have a very slow computer, so I have to take
+   his word for it. ;)
+ - I also removed most of the messages dgen makes (except for errors), so that
+   it is quieter. If you liked having all those messages, tell me and I'll put
+   them back in. ;)

@@ -1,0 +1,92 @@
+Emulation-related bugs
+======================
+
+This is a non-exhaustive list of games that are currently not working properly
+in DGen due to bad or incomplete emulation.
+
+Working, with glitches
+----------------------
+
+- Double Dragon 2
+Sometimes slower than it should be.
+
+- Lotus 2 Recs
+Sprites sometimes visible behind hills.
+
+- Road Rash 1/2/3
+EA intro is mangled.
+
+- Sonic 2 prototype
+No sound/music.
+
+- Street Racer
+Intro and some pictures are mangled, palette issues.
+
+- Streets of Rage 1
+Characters (and other sprites) are always drawn in front of the HUD.
+Starting with level 2, weapons and items are drawn in front of all other
+sprites.
+End of level counter sound is bad.
+
+- Aleste - Full metal fighter Ellinor
+Sprites are drawn in front of the HUD.
+
+- Ayrton Senna's Super Monaco
+Sky is black and top screen color is wrong.
+
+- Golden Axe 2
+Some sort of loop at start that freezes DGen for a while.
+Issue present with both Musashi and StarScream.
+
+- Gynoug
+Menu/intro backgrounds are mangled.
+
+- James Pond 2
+EA intro is mangled.
+
+- Mickey Mania
+In "Moose Chase" level, there's a weird semi-transparent moose shadow.
+Mickey is also drawn in front of the top border.
+
+- Super Fantasy Zone
+Sprites are drawn in front of the HUD.
+
+- Super Hang-on
+Bad horizon line.
+Sprites sometimes visible behind hills.
+
+- Thunder force 3
+Main weapon sound is bad.
+
+- Viewpoint
+Menu background is mangled.
+
+Non-working (must be fixed)
+---------------------------
+
+- All hacked games with added intros
+They either display a blank screen or crash after the intro.
+
+- Time killers
+Blank screen.
+
+- Lemmings 2 - The tribes
+Sprites colors are wrong, crashes when trying to start a game.
+
+- Sub Terrania
+Crashes when starting a game.
+
+- Thunder force 4
+Blank screen.
+
+- Zool
+EA intro is mangled, then the game freezes.
+
+Non-working (this is expected)
+------------------------------
+
+- Ya-Se Chuan Shuo
+Freezes (missing hardware?)
+
+- Virtua Racing
+Missing proper hardware emulation.
