@@ -58,7 +58,7 @@ uint8_t *load_rom(size_t *rom_size, const char *name)
 		return NULL;
 	}
 
-	fprintf(stderr,"loading rom ..\n");
+	fprintf(stderr,"load_rom: '%s'\n", name);
 
 	/* A valid ROM will surely not be bigger than 64MB. */
 	rom = load(&size, file, (64 * 1024 * 1024));

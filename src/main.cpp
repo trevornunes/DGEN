@@ -28,14 +28,33 @@
 
 
 #ifdef __QNXNTO__
-#include "playbook_utils.h"
+#include "playbookrom.h"
+
+void md_shutdown(md& megad);
+int md_startup(md& megad);
+void md_load(md& megad);
+void md_save(md& megad);
+void ram_load(md& megad);
+void ram_save(md& megad);
+
 #endif
 // Defined in ras.cpp, and set to true if the Genesis palette's changed.
 extern int pal_dirty;
+int load_new_game_g = 0;
 
+int slot = 0;  // see md_save and related
+unsigned long oldclk, newclk, startclk, fpsclk;  // used in main and playbook_load ...
+int start_slot = -1;
+int c = 0, pal_mode = 0, running = 1, usec = 0;
+unsigned long frames = 0, frames_old = 0, fps = 0;
+char *patches = NULL, *rom = NULL;
 FILE *debug_log = NULL;
+unsigned int samples;
+unsigned int hz = 60;
+char region = '\0';
 
 PlaybookRom  PBROM(PlaybookRom::rom_smd_c);
+
 
 // Do a demo frame, if active
 enum demo_status {
@@ -56,23 +75,28 @@ void playbook_setup(void)
   perror("smd 777");
 
   PBROM.updateRomList();
-
   fprintf(stderr,"playbook_setup: done\n");
-
 }
 
 
-void playbook_LoadNewGame(char *rom)
+/******************************
+ *
+ ******************************/
+int md_load_new_rom(md& megad, char *rom)
 {
-	/*
+
 	if(!rom)
-		return;
+		return -1;
+
+	// suspend CPU , save ...
+    md_shutdown(megad);
+    md_startup(megad);
 
 	// Load the requested ROM
 	  if(megad.load(rom))
 	    {
 	      fprintf(stderr, "main: Couldn't load ROM file %s!\n", rom);
-	      return 1;
+	      return -1;
 	    }
 	  // Set untouched pads
 	  megad.pad[0] = megad.pad[1] = 0xF303F;
@@ -80,12 +104,16 @@ void playbook_LoadNewGame(char *rom)
 	  if(dgen_joystick)
 	    megad.init_joysticks(dgen_joystick1_dev, dgen_joystick2_dev);
 	#endif
+
+/*
 	  // Load patches, if given
 	  if(patches)
 	    {
 	      printf("main: Using patch codes %s\n", patches);
 	      megad.patch(patches, NULL, NULL, NULL);
 	    }
+*/
+
 	  // Fix checksum
 	  megad.fix_rom_checksum();
 	  // Reset
@@ -93,12 +121,14 @@ void playbook_LoadNewGame(char *rom)
 
 	  // Load up save RAM
 	  ram_load(megad);
+
 	  // If autoload is on, load save state 0
 	  if(dgen_autoload)
 	    {
 	      slot = 0;
 	      md_load(megad);
 	    }
+
 	  // If -s option was given, load the requested slot
 	  if(start_slot >= 0)
 	    {
@@ -110,7 +140,67 @@ void playbook_LoadNewGame(char *rom)
 	  startclk = pd_usecs();
 	  oldclk = startclk;
 	  fpsclk = startclk;
-*/
+
+	//  if(dgen_sound) pd_sound_start();
+  pd_message( PBROM.getInfoStr().c_str() );
+//  pd_show_carthead(megad);
+
+  return 1;
+}
+
+
+
+int md_startup(md& megad)
+{
+	// Start up the sound chips.
+	if (YM2612Init(1,
+		       (((pal_mode) ? PAL_MCLK : NTSC_MCLK) / 7),
+		       dgen_soundrate, NULL, NULL))
+		goto ym2612_fail;
+	if (SN76496_init(0,
+			 (((pal_mode) ? PAL_MCLK : NTSC_MCLK) / 15),
+			 dgen_soundrate, 16)) {
+		YM2612Shutdown();
+	ym2612_fail:
+		fprintf(stderr,
+			"main: Couldn't start sound chipset emulators!\n");
+		return 1;
+	}
+
+	/*
+  // Initialize the platform-dependent stuff.
+  if (!pd_graphics_init(dgen_sound, pal_mode, hz))
+    {
+      fprintf(stderr, "main: Couldn't initialize graphics!\n");
+      return 1;
+    }
+  if(dgen_sound)
+    {
+      if (dgen_soundsegs < 0)
+	      dgen_soundsegs = 0;
+      samples = (dgen_soundsegs * (dgen_soundrate / hz));
+      dgen_sound = pd_sound_init(dgen_soundrate, samples);
+    }
+    */
+  return 0;
+}
+
+void md_shutdown(md& megad)
+{
+ fprintf(stderr,"md_shutdown\n");
+
+	  ram_save(megad);
+	  if(dgen_autosave)
+	  {
+		   slot = 0;
+		   md_save(megad);
+	  }
+
+	  megad.unplug();
+
+	//  pd_quit();
+
+	  YM2612Shutdown();
 }
 
 
@@ -178,7 +268,6 @@ static void help()
 // Save/load states
 // It is externed from your implementation to change the current slot
 // (I know this is a hack :)
-int slot = 0;
 void md_save(md& megad)
 {
 	FILE *save;
@@ -224,7 +313,7 @@ void md_load(md& megad)
 }
 
 // Load/save states from file
-static void ram_save(md& megad)
+void ram_save(md& megad)
 {
 	FILE *save;
 	int ret;
@@ -242,7 +331,7 @@ fail:
 	fprintf(stderr, "Couldn't save battery RAM to `%s'\n", megad.romname);
 }
 
-static void ram_load(md& megad)
+void ram_load(md& megad)
 {
 	FILE *load;
 	int ret;
@@ -263,15 +352,10 @@ fail:
 
 int main(int argc, char *argv[])
 {
-  int c = 0, pal_mode = 0, running = 1, usec = 0, start_slot = -1;
-  unsigned long frames = 0, frames_old = 0, fps = 0;
-  char *patches = NULL, *rom = NULL;
-  unsigned long oldclk, newclk, startclk, fpsclk;
+
   FILE *file = NULL;
   enum demo_status demo_status = DEMO_OFF;
-  unsigned int samples;
-  unsigned int hz = 60;
-  char region = '\0';
+
 
   playbook_setup();
 
@@ -453,6 +537,19 @@ int main(int argc, char *argv[])
 */
 
    rom = (char *) PBROM.getRomNext();
+   int romsFound = PBROM.romCount();
+   if(romsFound)
+   {
+     pd_message("found roms ...");
+   }
+     else
+   {
+	  pd_message("NO ROMS FOUND!!!!");
+      while(1)
+      {
+    	  SDL_Delay(50);
+      }
+   }
 
    if(rom)
 	   fprintf(stderr,"main: rom=%s \n",rom);
@@ -464,6 +561,11 @@ int main(int argc, char *argv[])
       fprintf(stderr, "main: Megadrive init failed!\n");
       return 1;
     }
+
+
+
+
+
   // Load the requested ROM
   if(megad.load(rom))
     {
@@ -515,6 +617,17 @@ int main(int argc, char *argv[])
 
 	// Go around, and around, and around, and around... ;)
 	while (running) {
+
+		if(load_new_game_g)
+        {
+		  load_new_game_g = 0;
+		   rom = (char *) PBROM.getRomNext();
+		   md_load_new_rom(megad,rom);
+		  // md_shutdown()
+	      // md_startup();
+		  // playbook_load()
+        }
+
 		const unsigned int usec_frame = (1000000 / hz);
 		unsigned long tmp;
 		int frames_todo;

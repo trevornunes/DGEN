@@ -31,6 +31,14 @@
 #include "font.h"
 #include "system.h"
 
+#ifndef WITH_HQX
+#define WITH_HQX
+#endif
+
+#ifndef WITH_CTV
+#define WITH_CTV
+#endif
+
 #ifdef WITH_HQX
 #include "hqx.h"
 #endif
@@ -68,6 +76,9 @@ static int xs = 0;
 static int ys = 0;
 
 #endif // WITH_OPENGL
+
+extern int load_new_game_g;
+
 
 // Bad hack- extern slot etc. from main.cpp so we can save/load states
 extern int slot;
@@ -1184,6 +1195,7 @@ int pd_graphics_init(int want_sound, int want_pal, int hz)
 	if (hqx_initialized == 0) {
 		hqxInit();
 		hqx_initialized = 1;
+        fprintf(stderr,"hqx initialized\n");
 	}
 #endif
 
@@ -1885,10 +1897,8 @@ int pd_handle_events(md &megad)
 	  if(ksym == SDLK_0)
 	  {
 		 fprintf(stderr,"ROM selecta!\n");
-		 //extern PlaybookRom  PBROM;
-		 //char *newRom = (char *)PBROM.getRomNext();
-		 pd_message("loading ...");
-
+		 pd_message("load new game");
+         load_new_game_g = 1;
 		 break;
 	  }
 
