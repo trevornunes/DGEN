@@ -18,11 +18,11 @@
     <!-- A string value of the format <0-999>.<0-999>.<0-999> that represents application version which can be used to check for application upgrade. 
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
          An updated version of application must have a versionNumber value higher than the previous version. Required. -->
-    <versionNumber>1.0.0</versionNumber>
+    <versionNumber>1.0.1</versionNumber>
 
     <!-- Fourth digit segment of the package version. First three segments are taken from the 
          <versionNumber> element.  Must be an integer from 0 to 2^16-1 -->
-    <buildId>4</buildId>
+    <buildId>0</buildId>
                  
     <!-- A string value (such as "v1", "2.5", or "Alpha 1") that represents the version of the application, as it should be shown to users. Optional. -->
     <!-- <versionLabel></versionLabel> -->
@@ -52,7 +52,6 @@
     <!--  The category where the application appears. Either core.games or core.media. -->
     <category>core.games</category>
     <asset path="${workspace_loc:/SDL12/Device-Release/libSDL12.so}" type="Qnx/Elf">lib/libSDL12.so</asset>
-    <asset path="${workspace_loc:/FCEUXpb/3rdparty/libs/libTouchControlOverlay.so}" type="Qnx/Elf">lib/libTouchControlOverlay.so</asset>
     <asset path="${workspace_loc:/DevIL/Device-Release/libDevIL.so}" type="Qnx/Elf">lib/libDevIL.so</asset>
     <asset path="sdl-controls.xml">sdl-controls.xml</asset>
     <asset path="media/load.png">load.png</asset>
@@ -60,7 +59,6 @@
     <asset path="media/dpad.png">dpad.png</asset>
     <asset path="DGen_Logo.png">DGen_Logo.png</asset>
     <asset path="media/B.png">B.png</asset>
-    <asset path="${workspace_loc:/pbrom/Device-Release/libpbrom.so}" type="Qnx/Elf">lib/libpbrom.so</asset>
     <asset path="media/smd_A.png">smd_A.png</asset>
     <asset path="media/smd_B.png">smd_B.png</asset>
     <asset path="media/smd_C.png">smd_C.png</asset>
@@ -70,7 +68,7 @@
     <asset path="media/hqx.png">hqx.png</asset>
     <asset path="media/oldtelly.png">oldtelly.png</asset>
     <asset path="media/froggyface.png">froggyface.png</asset>
-    <asset path="${QNX_TARGET}\..\target-override\armle-v7\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
+    <asset path="${workspace_loc:/TouchControlOverlay/Device-Release/libTouchControlOverlay.so}" type="Qnx/Elf">lib/libTouchControlOverlay.so</asset>
     <configuration id="com.qnx.qcc.configuration.exe.debug.340233179" name="Device-Debug">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="Device-Debug/dgen" entry="true" type="Qnx/Elf">dgen</asset>
