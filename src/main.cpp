@@ -34,13 +34,12 @@
 
 using namespace std;
 #ifdef __QNXNTO__
+#include "rompb.h"
 
 char g_runningFile_str[64];
 
-static vector<string> vsList;
-
 void md_shutdown(md& megad);
-int md_startup(md& megad);
+int  md_startup(md& megad);
 void md_load(md& megad);
 void md_save(md& megad);
 void ram_load(md& megad);
@@ -72,182 +71,25 @@ enum demo_status {
 	DEMO_PLAY
 };
 
-void playbook_setup(void)
+Rompb romp = Rompb( Rompb::rom_smd_c );
+
+void rombrowser_setup(void)
 {
-
-  mkdir("/accounts/1000/shared/misc/dgen",0777);
-  chmod("/accounts/1000/shared/misc/dgen",0777);
-  perror("dgen 777 ");
-
-  mkdir("/accounts/1000/shared/misc/roms/smd",0777);
-  chmod("/accounts/1000/shared/misc/roms/smd",0777);
-  perror("smd 777");
-
-// update rom list here? ROMLIST
-  fprintf(stderr,"playbook_setup: done\n");
+   romp.getRomList();
 }
 
-vector<string> GetRomDirListing( const char *dpath )
-
+const char *rombrowser_next()
 {
- //vector<string> vsList;
-
-#ifdef __PLAYBOOK__
-	DIR* dirp;
-	struct dirent* direntp;
-
-#endif
-
-if(!dpath)
-{
-    fprintf(stderr,"dpath is null.\n");
-	return vsList;
+	return romp.getRomNext();
 }
 
-#ifdef __PLAYBOOK__
-
-  dirp = opendir( "/accounts/1000/shared/misc/roms/smd/" );
-  if( dirp != NULL )
-  {
-	 for(;;)
-	 {
-		direntp = readdir( dirp );
-		if( direntp == NULL )
-		  break;
-
-		 fprintf(stderr,"FILE: '%s' \n", direntp->d_name);
-		// FCEUI_DispMessage(direntp->d_name,0);
-		  string tmp = direntp->d_name;
-
-		  if( strcmp( direntp->d_name, ".") == 0)
-		  {
-			 continue;
-		  }
-
-		  if( strcmp( direntp->d_name,"..") == 0)
-			  continue;
-
-		  if( (tmp.substr(tmp.find_last_of(".") + 1) == "smd") ||
-			  (tmp.substr(tmp.find_last_of(".") + 1) == "SMD") ||
-			  (tmp.substr(tmp.find_last_of(".") + 1) == "bin") ||
-			  (tmp.substr(tmp.find_last_of(".") + 1) == "BIN"));
-		  {
-	         // fprintf(stderr,"ROM: %s\n", direntp->d_name);
-			  vsList.push_back(direntp->d_name);
-		  }
-	 }
- }
-  else
-  {
-	fprintf(stderr,"dirp is NULL ...\n");
-  }
-
-#endif
- fprintf(stderr,"number of files %d\n", vsList.size() );
-
- if (vsList.size() == 0) {
-	 dialog_instance_t alert_dialog = 0;
-	 	 dialog_request_events(0);    //0 indicates that all events are requested
-	 	 if (dialog_create_alert(&alert_dialog) != BPS_SUCCESS) {
-	 		 fprintf(stderr, "Failed to create alert dialog.");
-	      //return EXIT_FAILURE;
-	 	 }
-	 	 dialog_set_title_text(alert_dialog, "GBColor-PB Error Report");
-	 	 if (dialog_set_alert_html_message_text(alert_dialog, "<u><b>ERROR:</b> You do not have any ROMS!<br></u><b>Add smd/bin ROMS to:</b> <br><u>\"shared/misc/roms/smd\"</u><br>using either <i>WiFi sharing</i> or <i>Desktop Software.</i>")
-	 			 != BPS_SUCCESS) {
-	 		 fprintf(stderr, "Failed to set alert dialog message text.");
-	 		 dialog_destroy(alert_dialog);
-	 		 alert_dialog = 0;
-	        //return EXIT_FAILURE;
-	 	 }
-
-	 	 char* cancel_button_context = "Cancelled";
-
-	 	 if (dialog_add_button(alert_dialog, "OK", true, 0, true)
-	 			 != BPS_SUCCESS) {
-	 		 fprintf(stderr, "Failed to add button to alert dialog.");
-	 		 dialog_destroy(alert_dialog);
-	 		 alert_dialog = 0;
-	        //return EXIT_FAILURE;
-	 	 }
-
-	 	 if (dialog_show(alert_dialog) != BPS_SUCCESS) {
-	 		 fprintf(stderr, "Failed to show alert dialog.");
-	 		 dialog_destroy(alert_dialog);
-	 		 alert_dialog = 0;
-	 		 //return EXIT_FAILURE;
-	 	 }
-
-	 	 while (1) {
-	 		 bps_event_t *event = NULL;
-	 		 bps_get_event(&event, -1);    // -1 means that the function waits
-	                                    // for an event before returning
-
-	 		 if (event) {
-	 			 if (bps_event_get_domain(event) == dialog_get_domain()) {
-
-	 				 int selectedIndex =
-	 						 dialog_event_get_selected_index(event);
-	 				 const char* label =
-	 						 dialog_event_get_selected_label(event);
-	 				 const char* context =
-	 						 dialog_event_get_selected_context(event);
-
-	 				 exit(-1);
-	 			 }
-	 		 }
-	 	 }
-
-	 	 if (alert_dialog) {
-	 		 dialog_destroy(alert_dialog);
-	 	 }
-	  }
-
- return vsList;
+const char *rombrowser_get_rom_name()
+{
+	return romp.getActiveRomName().c_str();
 }
 
 
 
-#ifdef __PLAYBOOK__
-static pthread_mutex_t loader_mutex = PTHREAD_MUTEX_INITIALIZER;
-static vector<string> vecList;
-vector<string> sortedvecList;
-#endif
-
-//
-//
-//
-
-
-vector<string> sortAlpha(vector<string> sortThis)
-{
-     int swap;
-     string temp;
-
-     do
-     {
-         swap = 0;
-         for (int count = 0; count < sortThis.size() - 1; count++)
-         {
-             if (sortThis.at(count) > sortThis.at(count + 1))
-             {
-                   temp = sortThis.at(count);
-                   sortThis.at(count) = sortThis.at(count + 1);
-                   sortThis.at(count + 1) = temp;
-                   swap = 1;
-             }
-         }
-     }while (swap != 0);
-
-     return sortThis;
-}
-
-
-void UpdateRomList(void)
-{
-  vecList = GetRomDirListing("/accounts/1000/shared/misc/roms/smd");
-  sortedvecList = sortAlpha(vecList);
-}
 
 /******************************
  *
@@ -257,6 +99,8 @@ int md_load_new_rom(md& megad, char *rom)
 
 	if(!rom)
 		return -1;
+
+	printf("md_load_new_rom %s", rom);
 
 	// suspend CPU , save ...
     md_shutdown(megad);
@@ -532,18 +376,14 @@ fail:
 
 int main(int argc, char *argv[])
 {
-	playbook_setup();
-	bps_initialize();
-	dialog_request_events(0);
-	UpdateRomList();
-  FILE *file = NULL;
-  enum demo_status demo_status = DEMO_OFF;
+	rombrowser_setup();
 
-
-  playbook_setup();
+    FILE *file = NULL;
+    enum demo_status demo_status = DEMO_OFF;
 
 	// Parse the RC file
-	if ((file = dgen_fopen_rc(DGEN_READ)) != NULL) {
+	if ((file = dgen_fopen_rc(DGEN_READ)) != NULL)
+	{
 		parse_rc(file, DGEN_RC);
 		fclose(file);
 		file = NULL;
@@ -664,6 +504,7 @@ int main(int argc, char *argv[])
 	case '?': // Bad option!
 	case 'h': // A cry for help :)
 	  help();
+	  break;
         case 's':
           // Pick a savestate to autoload
           start_slot = atoi(optarg);
@@ -719,93 +560,9 @@ int main(int argc, char *argv[])
   rom = argv[optind];
 */
 
-
-  int status = 0;
-
-
-      pthread_mutex_lock(&loader_mutex);
-      const char ** list = 0;
-      int count = 0;
-      list = (const char**)malloc(sortedvecList.size()*sizeof(char*));
-
-
-
-      for(;;){
-      	if(count >= sortedvecList.size()) break;
-      	fprintf(stderr, "%d \n", count);
-      	list[count] = sortedvecList[count].c_str();
-      	count++;
-      }
-
-      // ROM selector
-         dialog_instance_t dialog = 0;
-         int i, rc;
-         bps_event_t *event;
-         int domain = 0;
-         const char * label;
-
-         dialog_create_popuplist(&dialog);
-         dialog_set_popuplist_items(dialog, list, sortedvecList.size());
-
-             char* cancel_button_context = "Canceled";
-             char* okay_button_context = "Okay";
-             dialog_add_button(dialog, DIALOG_CANCEL_LABEL, true, cancel_button_context, true);
-             dialog_add_button(dialog, DIALOG_OK_LABEL, true, okay_button_context, true);
-             dialog_set_popuplist_multiselect(dialog, false);
-             dialog_show(dialog);
-
-             while(1){
-                 bps_get_event(&event, -1);
-
-                 if (event) {
-                     domain = bps_event_get_domain(event);
-                     if (domain == dialog_get_domain()) {
-                         int *response[1];
-                         int num;
-
-                         label = dialog_event_get_selected_label(event);
-
-                         if(strcmp(label, DIALOG_OK_LABEL) == 0){
-                             dialog_event_get_popuplist_selected_indices(event, (int**)response, &num);
-                             if(num != 0){
-                                 //*response[0] is the index that was selected
-                                 printf("%s", list[*response[0]]);fflush(stdout);
-                                 strcpy(romfilename, list[*response[0]]);
-                             }
-                             bps_free(response[0]);
-                         } else {
-                             printf("User has canceled ISO dialog.");
-                             return false;
-                         }
-                         break;
-                     }
-                 }
-             }
-
-
-      //test end
-
-  	fprintf(stderr,"AutoLoadRom\n");
-      string baseDir ="/accounts/1000/shared/misc/roms/smd/";
-
-      memset(&g_runningFile_str[0],0,64);
-      sprintf(&g_runningFile_str[0], romfilename);
-
-      baseDir = baseDir + romfilename;
-      fprintf(stderr,"loading: %d/%d '%s'\n",gameIndex + 1, sortedvecList.size(), baseDir.c_str() );
-
-
-
-
-
-
-     pthread_mutex_unlock(&loader_mutex);  // -lpthread normally would be added, it's already in PB runtime.
-
-     free(list);
-     fprintf(stderr,"still loading?\n");
-    strcpy(rom, baseDir.c_str());
-    fprintf(stderr,"still loading?\n");
-    fprintf(stderr,"main: rom=%s \n",rom);
+      sprintf( rom, rombrowser_next() ); // full path to rom file
+      memset(&g_runningFile_str[0],0, 63); // rom file name for display on screen.
+      sprintf(&g_runningFile_str[0], rombrowser_get_rom_name()  );
 
   // Create the megadrive object
   md megad(pal_mode, region);
@@ -814,10 +571,6 @@ int main(int argc, char *argv[])
       fprintf(stderr, "main: Megadrive init failed!\n");
       return 1;
     }
-
-
-
-
 
   // Load the requested ROM
   if(megad.load(rom))
@@ -870,95 +623,11 @@ int main(int argc, char *argv[])
 
 	// Go around, and around, and around, and around... ;)
 	while (running) {
-
 		if(load_new_game_g)
         {
 		  load_new_game_g = 0;
-
-		  int status = 0;
-
-
-		      pthread_mutex_lock(&loader_mutex);
-		      const char ** list = 0;
-		      int count = 0;
-		      list = (const char**)malloc(sortedvecList.size()*sizeof(char*));
-
-
-
-		      for(;;){
-		      	if(count >= sortedvecList.size()) break;
-		      	fprintf(stderr, "%d \n", count);
-		      	list[count] = sortedvecList[count].c_str();
-		      	count++;
-		      }
-
-		      // ROM selector
-		         dialog_instance_t dialog = 0;
-		         int i, rc;
-		         bps_event_t *event;
-		         int domain = 0;
-		         const char * label;
-
-		         dialog_create_popuplist(&dialog);
-		         dialog_set_popuplist_items(dialog, list, sortedvecList.size());
-
-		             char* cancel_button_context = "Canceled";
-		             char* okay_button_context = "Okay";
-		             dialog_add_button(dialog, DIALOG_CANCEL_LABEL, true, cancel_button_context, true);
-		             dialog_add_button(dialog, DIALOG_OK_LABEL, true, okay_button_context, true);
-		             dialog_set_popuplist_multiselect(dialog, false);
-		             dialog_show(dialog);
-
-		             while(1){
-		                 bps_get_event(&event, -1);
-
-		                 if (event) {
-		                     domain = bps_event_get_domain(event);
-		                     if (domain == dialog_get_domain()) {
-		                         int *response[1];
-		                         int num;
-
-		                         label = dialog_event_get_selected_label(event);
-
-		                         if(strcmp(label, DIALOG_OK_LABEL) == 0){
-		                             dialog_event_get_popuplist_selected_indices(event, (int**)response, &num);
-		                             if(num != 0){
-		                                 //*response[0] is the index that was selected
-		                                 printf("%s", list[*response[0]]);fflush(stdout);
-		                                 strcpy(romfilename, list[*response[0]]);
-		                             }
-		                             bps_free(response[0]);
-		                         } else {
-		                             printf("User has canceled ISO dialog.");
-		                             return false;
-		                         }
-		                         break;
-		                     }
-		                 }
-		             }
-
-
-		      //test end
-
-		  	fprintf(stderr,"AutoLoadRom2\n");
-		      string baseDir ="/accounts/1000/shared/misc/roms/smd/";
-
-		      memset(&g_runningFile_str[0],0,64);
-		      sprintf(&g_runningFile_str[0], romfilename);
-
-		      baseDir = baseDir + romfilename;
-		      fprintf(stderr,"loading: %d/%d '%s'\n",gameIndex + 1, sortedvecList.size(), baseDir.c_str() );
-
-		      strcpy(rom, baseDir.c_str());
-
-
-
-
-		     pthread_mutex_unlock(&loader_mutex);  // -lpthread normally would be added, it's already in PB runtime.
-
-		     free(list);
-
-
+		   // bb10 Dialog here ...
+		   strcpy(rom, rombrowser_next() );
 		   md_load_new_rom(megad,rom);
 		  // md_shutdown()
 	      // md_startup();

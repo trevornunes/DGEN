@@ -20,6 +20,11 @@
 #include "pd-defs.h"
 #include "md-phil.h"
 
+
+#ifdef __QNXNTO__
+#include <ctype.h>  // isascii
+#endif
+
 // CTV names
 const char *ctv_names[NUM_CTV] = { "off", "blur", "scanline", "interlace" };
 
@@ -465,7 +470,12 @@ static char *strclean(char *s)
 	size_t i;
 
 	for (i = 0; (s[i] != '\0'); ++i)
+#ifndef __QNXNTO__
 		if (!isprint(s[i]))
+#else
+		if (!isascii(s[i]))
+			s[i] = '?';
+#endif
 			s[i] = '?';
 	return s;
 }

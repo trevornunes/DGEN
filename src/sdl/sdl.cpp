@@ -1191,7 +1191,7 @@ int pd_graphics_init(int want_sound, int want_pal, int hz)
 	int depth = dgen_depth;
 #ifdef WITH_HQX
 	static int hqx_initialized = 0;
-
+    printf("Initialize HQX");
 	if (hqx_initialized == 0) {
 		hqxInit();
 		hqx_initialized = 1;
@@ -1223,6 +1223,8 @@ int pd_graphics_init(int want_sound, int want_pal, int hz)
   /* Neither scale value may be 0 or negative */
   if(x_scale <= 0) x_scale = 1;
   if(y_scale <= 0) y_scale = 1;
+
+  printf("initialize SDL_Init\n");
 
   if(SDL_Init(want_sound? (SDL_INIT_VIDEO | SDL_INIT_AUDIO) : (SDL_INIT_VIDEO)))
     {
@@ -1279,6 +1281,7 @@ int pd_graphics_init(int want_sound, int want_pal, int hz)
 			info.height = 16;
 		else
 			info.height = dgen_info_height;
+		printf("Setting video mode \n");
 		screen = SDL_SetVideoMode(xs, (ys + info.height), depth,
 					  (SDL_HWPALETTE | SDL_HWSURFACE |
 					   SDL_DOUBLEBUF | SDL_ASYNCBLIT |

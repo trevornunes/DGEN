@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "hqx.h"
-#include "IL/il.h""  // Developers Image Library 'ImageLoading IL' component
+#include "IL/il.h"  // Developers Image Library 'ImageLoading IL' component
 
 
 static inline uint32_t swapByteOrder(uint32_t ui)

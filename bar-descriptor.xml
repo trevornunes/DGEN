@@ -18,7 +18,7 @@
     <!-- A string value of the format <0-999>.<0-999>.<0-999> that represents application version which can be used to check for application upgrade. 
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
          An updated version of application must have a versionNumber value higher than the previous version. Required. -->
-    <versionNumber>1.0.1</versionNumber>
+    <versionNumber>1.10.2</versionNumber>
 
     <!-- Fourth digit segment of the package version. First three segments are taken from the 
          <versionNumber> element.  Must be an integer from 0 to 2^16-1 -->
@@ -36,23 +36,25 @@
     <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
     <author>t</author>
     <authorId>gYAAgOKRaqVbNM5ToziNoZFV720</authorId>
+    <platformVersion>10.0.9.386</platformVersion>
     <description>Sega Genesis/Megadrive emulator</description>
-    <icon>
-       <image>DGen_Logo.png</image>
-    </icon>
     
     <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
     <!-- <authorId>ABC1234YjsnUk235h</authorId> -->
    
     <initialWindow>
+        <aspectRatio>landscape</aspectRatio>
+        <autoOrients>false</autoOrients>
         <systemChrome>none</systemChrome>
         <transparent>false</transparent>
     </initialWindow>
     
     <!--  The category where the application appears. Either core.games or core.media. -->
     <category>core.games</category>
+    <icon>
+       <image>DGen_Logo_BB10.png</image>
+    </icon>
     <asset path="${workspace_loc:/SDL12/Device-Release/libSDL12.so}" type="Qnx/Elf">lib/libSDL12.so</asset>
-    <asset path="${workspace_loc:/DevIL/Device-Release/libDevIL.so}" type="Qnx/Elf">lib/libDevIL.so</asset>
     <asset path="sdl-controls.xml">sdl-controls.xml</asset>
     <asset path="media/load.png">load.png</asset>
     <asset path="media/save.png">save.png</asset>
@@ -69,44 +71,31 @@
     <asset path="media/oldtelly.png">oldtelly.png</asset>
     <asset path="media/froggyface.png">froggyface.png</asset>
     <asset path="${workspace_loc:/TouchControlOverlay/Device-Release/libTouchControlOverlay.so}" type="Qnx/Elf">lib/libTouchControlOverlay.so</asset>
-    <configuration id="com.qnx.qcc.configuration.exe.debug.340233179" name="Device-Debug">
-       <platformArchitecture>armle-v7</platformArchitecture>
-       <asset path="Device-Debug/dgen" entry="true" type="Qnx/Elf">dgen</asset>
-    </configuration>
+    <asset path="${workspace_loc:/DevIL/Device-Release/libDevIL.so}" type="Qnx/Elf">lib/libDevIL.so</asset>
+    <asset path="${workspace_loc:/dgen/DGen_Logo_BB10.png}">DGen_Logo_BB10.png</asset>
     <configuration id="com.qnx.qcc.configuration.exe.release.1179344344" name="Device-Release">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="Device-Release/dgen" entry="true" type="Qnx/Elf">dgen</asset>
     </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.profile.41982325" name="Device-Profile">
+    <configuration id="com.qnx.qcc.configuration.exe.debug.340233179" name="Device-Debug">
        <platformArchitecture>armle-v7</platformArchitecture>
-       <asset path="Device-Profile/dgen" entry="true" type="Qnx/Elf">dgen</asset>
-    </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.profile.coverage.1497105176" name="Device-Coverage">
-       <platformArchitecture>armle-v7</platformArchitecture>
-       <asset path="Device-Coverage/dgen" entry="true" type="Qnx/Elf">dgen</asset>
+       <asset path="Device-Debug/dgen" entry="true" type="Qnx/Elf">dgen</asset>
     </configuration>
     <configuration id="com.qnx.qcc.configuration.exe.debug.313432894" name="Simulator">
        <platformArchitecture>x86</platformArchitecture>
        <asset path="Simulator/dgen" entry="true" type="Qnx/Elf">dgen</asset>
     </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.profile.1794714809" name="Simulator-Profile">
-       <platformArchitecture>x86</platformArchitecture>
-       <asset path="Simulator-Profile/dgen" entry="true" type="Qnx/Elf">dgen</asset>
-    </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.profile.coverage.1968666625" name="Simulator-Coverage">
-       <platformArchitecture>x86</platformArchitecture>
-       <asset path="Simulator-Coverage/dgen" entry="true" type="Qnx/Elf">dgen</asset>
-    </configuration>
-    
+
+   
     <!--  The icon for the application, which should be 86x86. -->
     
     <!--  The splash screen that will appear when your application is launching. Should be 1024x600. -->
     <!-- <splashscreen></splashscreen> -->
 
     <!-- Request permission to execute native code.  Required for native applications. -->
-    <action system="true">run_native</action>
-    <action>access_shared</action>
-    <action>play_audio</action>
+  
+    <permission>play_audio</permission>
+    <permission>access_shared</permission>
     
     <!--  The permissions requested by your application. -->
     <!--  <action>access_shared</action> -->
