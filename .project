@@ -74,11 +74,4 @@
 		<nature>com.qnx.tools.ide.bbt.core.bbtnature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>DGen_Logo_BB10.png</name>
-			<type>1</type>
-			<location>C:/Users/Owner/git/DGENbb10/DGen_Logo_BB10.png</location>
-		</link>
-	</linkedResources>
 </projectDescription>
