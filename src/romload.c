@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
+
 #include "romload.h"
 #include "system.h"
 
@@ -49,12 +51,10 @@ uint8_t *load_rom(size_t *rom_size, const char *name)
 
 	// file = dgen_fopen("/accounts/1000/shared/misc/roms/smd", name, (DGEN_READ | DGEN_CURRENT));
 
-
 	file = fopen(name,"r");
 
 	if (file == NULL) {
-		perror("load_rom: error");
-		fprintf(stderr, "load_rom:  '%s' Can't open ROM file FD=NULL \n", name);
+		perror(name);
 		return NULL;
 	}
 

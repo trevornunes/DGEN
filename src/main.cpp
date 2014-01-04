@@ -16,7 +16,7 @@
 #include <bps/dialog.h>
 #include <bps/bps.h>
 #include <bps/event.h>
-#include "utils\xstring.h"
+#include "utils/xstring.h"
 #include <pthread.h>
 #include <dirent.h>
 
@@ -75,7 +75,30 @@ Rompb romp = Rompb( Rompb::rom_smd_c );
 
 void rombrowser_setup(void)
 {
+   (void)mkdir( "/accounts/1000/shared/misc/dgen",
+                 S_IRWXU |
+                 S_IRGRP | S_IXGRP |
+                 S_IROTH | S_IXOTH );
+
+   (void)mkdir( "/accounts/1000/shared/misc/roms",
+           S_IRWXU |
+           S_IRGRP | S_IXGRP |
+           S_IROTH | S_IXOTH );
+
+   (void)mkdir( "/accounts/1000/shared/misc/roms/smd",
+           S_IRWXU |
+           S_IRGRP | S_IXGRP |
+           S_IROTH | S_IXOTH );
    romp.getRomList();
+   if ( romp.romCount() == 0)
+   {
+	   fprintf(stderr,"no roms found on setup.\n");
+   }
+   if( romp.romCount() == 0)
+   {
+	   romp.setRomPath("app/native");
+	   romp.getRomList();
+   }
 }
 
 const char *rombrowser_next()
@@ -89,7 +112,17 @@ const char *rombrowser_get_rom_name()
 }
 
 
+void rombrowser_update()
+{
+	 romp.getRomList();
+}
 
+void rombrowser_setpath(const char *newdir)
+{
+	if(newdir) {
+	   romp.setRomPath(newdir);
+	}
+}
 
 /******************************
  *
@@ -109,7 +142,7 @@ int md_load_new_rom(md& megad, char *rom)
 	// Load the requested ROM
 	  if(megad.load(rom))
 	    {
-	      fprintf(stderr, "main: Couldn't load ROM file %s!\n", rom);
+	      fprintf(stderr, "main: failed to load ROM '%s'\n", rom);
 	      return -1;
 	    }
 	  // Set untouched pads
@@ -351,7 +384,7 @@ fail:
 
 void ram_load(md& megad)
 {
-
+    fprintf(stderr,"ram_load save files \n");
 	char saves[256] = "/accounts/1000/shared/misc/dgen/saves/";
 	strcat(saves, romfilename);
 
@@ -547,8 +580,11 @@ int main(int argc, char *argv[])
   if (!pd_graphics_init(dgen_sound, pal_mode, hz))
     {
       fprintf(stderr, "main: Couldn't initialize graphics!\n");
+      fflush(stderr);
+      sleep(1);
       return 1;
     }
+
   if(dgen_sound)
     {
       if (dgen_soundsegs < 0)
@@ -560,9 +596,15 @@ int main(int argc, char *argv[])
   rom = argv[optind];
 */
 
+   if( romp.romCount() )
+   {
       sprintf( rom, rombrowser_next() ); // full path to rom file
+      fprintf(stderr,"ROM -> %s \n",rombrowser_get_rom_name() );
       memset(&g_runningFile_str[0],0, 63); // rom file name for display on screen.
       sprintf(&g_runningFile_str[0], rombrowser_get_rom_name()  );
+   } else {
+	   fprintf(stderr,"no roms found...\n");
+   }
 
   // Create the megadrive object
   md megad(pal_mode, region);
@@ -570,14 +612,17 @@ int main(int argc, char *argv[])
     {
       fprintf(stderr, "main: Megadrive init failed!\n");
       return 1;
+    } else {
+    	fprintf(stderr,"main: %s initialized.\n", pal_mode ? "megadrive" : "genesis");
     }
 
-  // Load the requested ROM
-  if(megad.load(rom))
-    {
-      fprintf(stderr, "main: Couldn't load ROM file %s!\n", rom);
-      return 1;
-    }
+  // load a default rom if none found in roms dir ...
+  int romNotLoaded = megad.load(rom);
+  if(romNotLoaded) {
+	  sprintf(rom,"app/native/demo_badapple.bin");
+	  romNotLoaded = megad.load(rom);
+  }
+
   // Set untouched pads
   megad.pad[0] = megad.pad[1] = 0xF303F;
 #ifdef WITH_JOYSTICK
@@ -619,16 +664,35 @@ int main(int argc, char *argv[])
   if(dgen_sound) pd_sound_start();
 
   // Show cartridge header
-  if(dgen_show_carthead) pd_show_carthead(megad);
+  if(!romNotLoaded) {
+      if(dgen_show_carthead) pd_show_carthead(megad);
+  }
 
 	// Go around, and around, and around, and around... ;)
+    fprintf(stderr,"enter main loop %d \n", running);
+
 	while (running) {
+
 		if(load_new_game_g)
         {
+		  fprintf(stderr,"load new ROM ...\n");
 		  load_new_game_g = 0;
 		   // bb10 Dialog here ...
 		   strcpy(rom, rombrowser_next() );
-		   md_load_new_rom(megad,rom);
+
+		   if( -1 == md_load_new_rom(megad,rom) ) {
+			   rombrowser_update();  // re-read ROM dir
+			   sleep(3);   // wait a few seconds ...
+               printf("md_load_new_rom: failed to locate ROM file\n");
+               pd_message("         no roms found, add some...");
+   			   pd_graphics_update();
+               load_new_game_g = 1;
+               continue;
+		   }
+
+		   pd_message( megad.cart_head.domestic_name );
+		   pd_graphics_update();
+		   sleep(1);
 		  // md_shutdown()
 	      // md_startup();
 		  // playbook_load()
@@ -641,6 +705,7 @@ int main(int argc, char *argv[])
 		newclk = pd_usecs();
 
 		if (pd_stopped()) {
+			fprintf(stderr,"pd_stopped\n");
 			// Fix FPS count.
 			tmp = (newclk - oldclk);
 			startclk += tmp;
@@ -687,7 +752,7 @@ int main(int argc, char *argv[])
 		else {
 			// Draw frames.
 			while (frames_todo != 1) {
-				do_demo(megad, file, &demo_status);
+				// do_demo(megad, file, &demo_status);
 				if (dgen_sound) {
 					// Skip this frame, keep sound going.
 					megad.one_frame(NULL, NULL, &sndi);
@@ -695,7 +760,7 @@ int main(int argc, char *argv[])
 				}
 				else
 					megad.one_frame(NULL, NULL, NULL);
-				--frames_todo;
+				  --frames_todo;
 			}
 			--frames_todo;
 		do_not_skip:
@@ -732,7 +797,8 @@ int main(int argc, char *argv[])
 	printf("%lu frames per second (average %lu, optimal %d)\n",
 	       fps, (frames / fpsclk), hz);
 
-  // Cleanup
+  fprintf(stderr,"shutdown...\n");
+
   if(file) fclose(file);
   ram_save(megad);
   if(dgen_autosave) { slot = 0; md_save(megad); }

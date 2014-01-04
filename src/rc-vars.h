@@ -67,22 +67,22 @@ RCVAR(dgen_load, PDK_F3);
 
 RCVAR(dgen_autoload, 0);
 RCVAR(dgen_autosave, 0);
-RCVAR(dgen_frameskip, 1);
+RCVAR(dgen_frameskip, 0);
 RCVAR(dgen_show_carthead, 0);
 
 RCVAR(dgen_sound, 1);
 RCVAR(dgen_soundrate, 22050);
-RCVAR(dgen_soundsegs, 8);
-RCVAR(dgen_soundsamples, 0);
+RCVAR(dgen_soundsegs, 16);
+RCVAR(dgen_soundsamples, 4);
 
 RCVAR(dgen_craptv, 0);
-RCVAR(dgen_scaling, 0);
+RCVAR(dgen_scaling, 1);
 RCVAR(dgen_nice, 0);
 RCVAR(dgen_joystick, 0);
 RCVAR(dgen_joystick1_dev, 0);
 RCVAR(dgen_joystick2_dev, 1);
 
-RCVAR(dgen_fullscreen, 0);
+RCVAR(dgen_fullscreen, 1);
 RCVAR(dgen_info_height, -1);
 RCVAR(dgen_scale, 1);
 RCVAR(dgen_depth, 0);

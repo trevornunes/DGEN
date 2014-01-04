@@ -1,58 +1,45 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <emulation version="1">
 
-<dpad x="2" y="180" width="60" height="60">
-<label x="0" y="0" width="60" height="60" image="smd_pad.png"/>
+<dpad x="2" y="180" width="62" height="62">
+<label x="0" y="0" width="62" height="62" image="smd_pad.png"/>
 </dpad>
 
 
-
-<key x="368" y="80" width="32" height="32" sym="13" scancode="13">
-<label x="0" y="0" width="32" height="32" image="smd_start.png"/>
+<key x="280" y="0" width="24" height="24" sym="13" scancode="13">
+<label x="0" y="0" width="24" height="24" image="smd_start.png"/>
 </key>
 
-<key x="300" y="200" width="32" height="32" sym="97" scancode="97">
+<key x="228" y="200" width="32" height="32" sym="97" scancode="97">
 <label x="0" y="0" width="32" height="32" image="smd_A.png"/>
 </key>
 
-<key x="330" y="185" width="32" height="32" sym="115" scancode="115">
+<key x="262" y="185" width="32" height="32" sym="115" scancode="115">
 <label x="0" y="0" width="32" height="32" image="smd_B.png"/>
 </key>
 
-<key x="360" y="165" width="32" height="32" sym="100" scancode="100">
+<key x="290" y="165" width="32" height="32" sym="100" scancode="100">
 <label x="0" y="0" width="32" height="32" image="smd_C.png"/>
 </key>
 
- 
-<key x="300" y="180" width="16" height="16" sym="113" scancode="113">
-<label x="0" y="0" width="16" height="16" image="B.png"/>
-</key>
 
-<key x="330" y="165" width="16" height="16" sym="119" scancode="119">
-<label x="0" y="0" width="16" height="16" image="B.png"/>
-</key>
-
-<key x="360" y="145" width="16" height="16" sym="101" scancode="101">
-<label x="0" y="0" width="16" height="16" image="B.png"/>
-</key>
-
-
-<key x="0" y="0" width="42" height="32" sym="48" scancode="254">
+<key x="0" y="0" width="42" height="32" sym="48" scancode="254" image="smd_card.png">
 <label x="0" y="0" width="42" height="32" image="smd_cart.png"/>
 </key>
 
-<key x="380" y="0" width="16" height="16" sym="287" scancode="287">
-<label x="0" y="0" width="16" height="16" image="hqx.png"/>
+<key x="280" y="74" width="16" height="16" sym="287" scancode="287">
 </key>
 
-<key x="370" y="32" width="24" height="16" sym="286" scancode="286">
-<label x="0" y="0" width="24" height="16" image="oldtelly.png"/>
+<key x="280" y="92" width="24" height="16" sym="286" scancode="286">
 </key>
 
-<key x="0" y="50" width="32" height="34" sym="60" scancode="60">
+<key x="0" y="110" width="32" height="34" sym="60" scancode="60">
 </key>
 
-<key x="0" y="84" width="32" height="34" sym="61" scancode="61">
+<key x="0" y="140" width="32" height="34" sym="61" scancode="61">
+</key>
+
+<key x="280" y="40" width="32" height="32" sym="9" scancode="9">
 </key>
 
 </emulation>

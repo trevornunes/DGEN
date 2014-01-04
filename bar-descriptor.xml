@@ -18,7 +18,7 @@
     <!-- A string value of the format <0-999>.<0-999>.<0-999> that represents application version which can be used to check for application upgrade. 
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
          An updated version of application must have a versionNumber value higher than the previous version. Required. -->
-    <versionNumber>1.10.2</versionNumber>
+    <versionNumber>1.10.4</versionNumber>
 
     <!-- Fourth digit segment of the package version. First three segments are taken from the 
          <versionNumber> element.  Must be an integer from 0 to 2^16-1 -->
@@ -36,7 +36,6 @@
     <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
     <author>t</author>
     <authorId>gYAAgOKRaqVbNM5ToziNoZFV720</authorId>
-    <platformVersion>10.0.9.386</platformVersion>
     <description>Sega Genesis/Megadrive emulator</description>
     
     <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
@@ -72,16 +71,15 @@
     <asset path="media/froggyface.png">froggyface.png</asset>
     <asset path="${workspace_loc:/TouchControlOverlay/Device-Release/libTouchControlOverlay.so}" type="Qnx/Elf">lib/libTouchControlOverlay.so</asset>
     <asset path="${workspace_loc:/DevIL/Device-Release/libDevIL.so}" type="Qnx/Elf">lib/libDevIL.so</asset>
-    <asset path="${workspace_loc:/dgen/DGen_Logo_BB10.png}">DGen_Logo_BB10.png</asset>
-    <configuration id="com.qnx.qcc.configuration.exe.release.1179344344" name="Device-Release">
+    <asset path="libpng16.so" type="Qnx/Elf">lib/libpng16.so.0</asset>
+    <asset path="media/demo_titan.bin">demo_titan.bin</asset>
+    <asset path="media/demo_badapple.bin">demo_badapple.bin</asset>
+    <asset path="media/mdem2011.bin">mdem2011.bin</asset>
+    <configuration name="Device-Release">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="Device-Release/dgen" entry="true" type="Qnx/Elf">dgen</asset>
     </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.debug.340233179" name="Device-Debug">
-       <platformArchitecture>armle-v7</platformArchitecture>
-       <asset path="Device-Debug/dgen" entry="true" type="Qnx/Elf">dgen</asset>
-    </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.debug.313432894" name="Simulator">
+    <configuration name="Simulator">
        <platformArchitecture>x86</platformArchitecture>
        <asset path="Simulator/dgen" entry="true" type="Qnx/Elf">dgen</asset>
     </configuration>
@@ -96,6 +94,7 @@
   
     <permission>play_audio</permission>
     <permission>access_shared</permission>
+    <permission>use_gamepad</permission>
     
     <!--  The permissions requested by your application. -->
     <!--  <action>access_shared</action> -->

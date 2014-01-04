@@ -171,13 +171,12 @@ vector<string> Rompb::getRomList( void )
 
   if(activeRomPath_m == "")
   {
-    activeRomList_vsm.clear();
-	return activeRomList_vsm;
+	activeRomPath_m = "./";
   }
 
   if( !pathExists( activeRomPath_m) )
   {
-	cout << "Directory '%s' not found ...";
+	cout << "\nrompb.cpp->getRomList() directory " << activeRomPath_m << " not found.\n";
     activeRomList_vsm.clear();
     return activeRomList_vsm;
   }
@@ -218,6 +217,7 @@ vector<string> Rompb::getRomList( void )
 
  // sort list here .
  fprintf(stderr,"number of files %d\n", activeRomList_vsm.size() );
+ activeRomIndex_m = 0;
  return activeRomList_vsm;
 }
 

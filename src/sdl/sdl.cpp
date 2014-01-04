@@ -20,6 +20,8 @@
 # include <SDL_opengl.h>
 #endif
 
+
+
 #ifdef HAVE_MEMCPY_H
 #include <memcpy.h>
 #endif
@@ -1191,7 +1193,7 @@ int pd_graphics_init(int want_sound, int want_pal, int hz)
 	int depth = dgen_depth;
 #ifdef WITH_HQX
 	static int hqx_initialized = 0;
-    printf("Initialize HQX");
+    printf("Initialize HQX\n");
 	if (hqx_initialized == 0) {
 		hqxInit();
 		hqx_initialized = 1;
@@ -1281,7 +1283,9 @@ int pd_graphics_init(int want_sound, int want_pal, int hz)
 			info.height = 16;
 		else
 			info.height = dgen_info_height;
-		printf("Setting video mode \n");
+
+		printf("Setting video mode %d x %d \n",xs, ys+info.height );
+
 		screen = SDL_SetVideoMode(xs, (ys + info.height), depth,
 					  (SDL_HWPALETTE | SDL_HWSURFACE |
 					   SDL_DOUBLEBUF | SDL_ASYNCBLIT |
@@ -1291,9 +1295,10 @@ int pd_graphics_init(int want_sound, int want_pal, int hz)
   if(!screen)
     {
 		fprintf(stderr, "sdl: Unable to set video mode: %s\n",
-			SDL_GetError());
+			   SDL_GetError());
 		return 0;
     }
+
   fprintf(stderr, "video: %dx%d, %d bpp (%d Bpp), %uHz\n",
 	  screen->w, screen->h,
 	  screen->format->BitsPerPixel, screen->format->BytesPerPixel,
@@ -1550,11 +1555,13 @@ snd_error:
 // Start/stop audio processing
 void pd_sound_start()
 {
+  fprintf(stderr,"pd_sound_start\n");
   SDL_PauseAudio(0);
 }
 
 void pd_sound_pause()
 {
+  fprintf(stderr,"pod_sound_pause\n");
   SDL_PauseAudio(1);
 }
 
@@ -1900,7 +1907,7 @@ int pd_handle_events(md &megad)
 	  if(ksym == SDLK_0)
 	  {
 		 fprintf(stderr,"ROM selecta!\n");
-		 pd_message("load new game");
+		 pd_message("          load new game");
          load_new_game_g = 1;
 		 break;
 	  }
@@ -2101,6 +2108,7 @@ int pd_handle_events(md &megad)
 
 	case SDL_QUIT:
 	  // We've been politely asked to exit, so let's leave
+		fprintf(stderr,"SDL_QUIT \n");
 	  return 0;
 	default:
 	  break;

@@ -148,6 +148,8 @@ int md::memory_map()
 
 int md::reset()
 {
+	fprintf(stderr,"md::reset\n");
+
 #ifdef WITH_STAR
 	md_set_star(1);
 	s68000reset();
@@ -221,6 +223,8 @@ extern "C" void cz80_iowrite(void *ctx, uint16_t a, uint8_t d);
 
 void md::z80_init()
 {
+    fprintf(stderr,"md::z80 \n");
+
 #ifdef WITH_MZ80
 	md_set_mz80(1);
 	mz80init();
@@ -547,8 +551,10 @@ int md::load(char *name)
 	fprintf(stderr,"md::load %s\n", name);
 	temp = load_rom(&size, name);
 
-	if (temp == NULL)
+	if (temp == NULL) {
+		fprintf(stderr,"md::load load_rom() failed\n");
 		return 1;
+	}
 
 	// Register name
 	romname[0] = '\0';
