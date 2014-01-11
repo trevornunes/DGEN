@@ -6,6 +6,7 @@
 
 #include "rompb.h"
 #include <dirent.h>
+#include <algorithm>  // find
 #include <iostream>
 #include <fstream>
 
@@ -71,9 +72,9 @@ Rompb::Rompb(rom_type_t rtype)
               break;
   }
 
-  cfgFilePath_m = activeRomPath_m + "pbrom.cfg";
+  cfgFilePath_m = activeRomPath_m + "/pbrom.cfg";
 #ifdef DEBUG
-  cout << "cfgFilePath_m " << cfgFilePath_m;
+  cout << "cfgFilePath_m " << cfgFilePath_m << endl;
 #endif
   loadState();
 }
@@ -174,10 +175,12 @@ vector<string> Rompb::getRomList( void )
 	activeRomPath_m = "./";
   }
 
+  activeRomList_vsm.clear();
+
   if( !pathExists( activeRomPath_m) )
   {
 	cout << "\nrompb.cpp->getRomList() directory " << activeRomPath_m << " not found.\n";
-    activeRomList_vsm.clear();
+
     return activeRomList_vsm;
   }
 
@@ -201,11 +204,10 @@ vector<string> Rompb::getRomList( void )
 		{
 		  continue;
 		}
-        cout << tmp;
+        //cout << tmp;
 		string extension = tmp.substr(tmp.find_last_of(".") +1);
         if( extensionIsValid( extension ) == true)
 		{
-	      fprintf(stderr,"ROM -> %s\n", direntp->d_name);
 	      activeRomList_vsm.push_back(direntp->d_name);
 	    }
 	 }
@@ -218,11 +220,38 @@ vector<string> Rompb::getRomList( void )
  // sort list here .
  fprintf(stderr,"number of files %d\n", activeRomList_vsm.size() );
  activeRomIndex_m = 0;
+ //std::sort( activeRomList_vsm.begin(), activeRomList_vsm.end() );
+ sortRoms();
+ // showRoms();
  return activeRomList_vsm;
 }
 
 
+void Rompb::showRoms(void)
+{
+  vector<string>::iterator it = activeRomList_vsm.begin();
+  for (it ; it != activeRomList_vsm.end(); ++it)
+	 std::cout << "ROM: " << *it << endl;
+}
 
+
+void Rompb::sortRoms(void) {
+        int swap;
+        string temp;
+
+        do {
+                swap = 0;
+                for (unsigned int count = 0; count < activeRomList_vsm.size() - 1;
+                                count++) {
+                        if (activeRomList_vsm.at(count) > activeRomList_vsm.at(count + 1)) {
+                                temp = activeRomList_vsm.at(count);
+                                activeRomList_vsm.at(count) = activeRomList_vsm.at(count + 1);
+                                activeRomList_vsm.at(count + 1) = temp;
+                                swap = 1;
+                        }
+                }
+        } while (swap != 0);
+}
 
 
 //*********************************************************
@@ -291,6 +320,39 @@ const char *Rompb::getRomPrev(void)
     return romName;
 }
 
+string Rompb::findRom(const char *srch)
+{
+  vector<string>::iterator it = activeRomList_vsm.begin();
+  int searchLen = strlen(srch);
+  unsigned int i = 0;
+  for (i = 0; i < activeRomList_vsm.size(); i++)
+  {
+	 if ( activeRomList_vsm[i].compare(0,searchLen, string(srch)) == 0)
+	 {
+		 setRomIndex(i-1);
+		 return activeRomList_vsm[i];
+	 }
+  }
+
+  return "";
+}
+
+
+
+  /*
+
+  it = std::find( activeRomList_vsm.begin(), activeRomList_vsm.end(),  string(srch) );
+
+  if( it == activeRomList_vsm.end() ) {
+	  cout << "no matching file name found for '"  << srch << "'" << endl;
+	  return "";
+  } else {
+	  cout << "found: " << *it << endl;
+      return *it;
+  }
+  */
+
+
 void Rompb::setActiveRomBad()
 {
   badRomList_vim.push_back( activeRomIndex_m );
@@ -326,8 +388,10 @@ void   Rompb::setRomIndex(unsigned int idx)
 {
    if( idx <= activeRomList_vsm.size() )
 	  activeRomIndex_m = idx;
+
    if( activeRomList_vsm.size() )
-   activeRom_m = activeRomList_vsm[activeRomIndex_m];
+     activeRom_m = activeRomList_vsm[activeRomIndex_m];
+   cout << "index now " << activeRomIndex_m << endl;
 }
 
 void Rompb::saveState(void)

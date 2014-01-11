@@ -434,6 +434,163 @@ cleanup:
 	memset(this, 0, sizeof(*this));
 }
 
+void md::recreate(int palmode, int reg)
+{
+	unsigned int hc;
+    pal = palmode;
+    region = reg;
+
+	if (pal) {
+		mclk = PAL_MCLK;
+		lines = PAL_LINES;
+		vhz = PAL_HZ;
+	}
+	else {
+		mclk = NTSC_MCLK;
+		lines = NTSC_LINES;
+		vhz = NTSC_HZ;
+	}
+	clk0 = (mclk / 15);
+	clk1 = (mclk / 7);
+	// Initialize horizontal counter table (Gens style)
+	for (hc = 0; (hc < 512); ++hc) {
+		// H32
+		hc_table[hc][0] = (((hc * 170) / M68K_CYCLES_PER_LINE) - 0x18);
+		// H40
+		hc_table[hc][1] = (((hc * 205) / M68K_CYCLES_PER_LINE) - 0x1c);
+	}
+
+  romlen=0;
+  mem=rom=ram=z80ram=saveram=NULL;
+  save_start=save_len=save_prot=save_active=0;
+
+  fm_reset();
+
+  memset(&m68k_state, 0, sizeof(m68k_state));
+  memset(&z80_state, 0, sizeof(z80_state));
+
+#ifdef WITH_MUSA
+	ctx_musa = calloc(1, m68k_context_size());
+	if (ctx_musa == NULL)
+		return;
+#endif
+
+#ifdef WITH_STAR
+  fetch=NULL;
+  readbyte=readword=writebyte=writeword=NULL;
+  memset(&cpu,0,sizeof(cpu));
+#endif
+
+#ifdef WITH_MZ80
+  memset(&z80,0,sizeof(z80));
+#endif
+#ifdef WITH_CZ80
+  Cz80_Init(&cz80);
+#endif
+
+  memset(&cart_head, 0, sizeof(cart_head));
+
+  memset(romname, 0, sizeof(romname));
+
+  ok=0;
+
+  //  Format of pad is: __SA____ UDLRBC__
+
+  rom=mem=ram=z80ram=NULL;
+  mem=(unsigned char *)malloc(0x20000);
+	if (mem == NULL)
+		goto cleanup;
+  memset(mem,0,0x20000);
+  ram=   mem+0x00000;
+  z80ram=mem+0x10000;
+
+  romlen=0;
+
+#ifdef WITH_STAR
+	md_set_star(1);
+	if (s68000init() != 0) {
+		md_set_star(0);
+		printf ("s68000init failed!\n");
+		goto cleanup;
+	}
+	md_set_star(0);
+
+// Dave: Rich said doing point star stuff is done after s68000init
+// in Asgard68000, so just in case...
+  fetch= new STARSCREAM_PROGRAMREGION[6]; if (!fetch)     return;
+  readbyte= new STARSCREAM_DATAREGION[5]; if (!readbyte)  return;
+  readword= new STARSCREAM_DATAREGION[5]; if (!readword)  return;
+  writebyte=new STARSCREAM_DATAREGION[5]; if (!writebyte) return;
+  writeword=new STARSCREAM_DATAREGION[5]; if (!writeword) return;
+  memory_map();
+
+  // point star stuff
+  cpu.s_fetch     = cpu.u_fetch     =     fetch;
+  cpu.s_readbyte  = cpu.u_readbyte  =  readbyte;
+  cpu.s_readword  = cpu.u_readword  =  readword;
+  cpu.s_writebyte = cpu.u_writebyte = writebyte;
+  cpu.s_writeword = cpu.u_writeword = writeword;
+
+	md_set_star(1);
+	s68000reset();
+	md_set_star(0);
+#endif
+
+	// M68K: 0 = none, 1 = StarScream, 2 = Musashi
+	switch (dgen_emu_m68k) {
+#ifdef WITH_STAR
+	case 1:
+		cpu_emu = CPU_EMU_STAR;
+		break;
+#endif
+#ifdef WITH_MUSA
+	case 2:
+		cpu_emu = CPU_EMU_MUSA;
+		break;
+#endif
+	default:
+		cpu_emu = CPU_EMU_NONE;
+		break;
+	}
+	// Z80: 0 = none, 1 = CZ80, 2 = MZ80
+	switch (dgen_emu_z80) {
+#ifdef WITH_MZ80
+	case 1:
+		z80_core = Z80_CORE_MZ80;
+		break;
+#endif
+#ifdef WITH_CZ80
+	case 2:
+		z80_core = Z80_CORE_CZ80;
+		break;
+#endif
+	default:
+		z80_core = Z80_CORE_NONE;
+		break;
+	}
+
+#ifdef WITH_MUSA
+	md_set_musa(1);
+	m68k_pulse_reset();
+	md_set_musa(0);
+#endif
+
+  z80_init();
+
+  reset(); // reset megadrive
+
+	patch_elem = NULL;
+
+  ok=1;
+
+	return;
+cleanup:
+#ifdef WITH_MUSA
+	free(ctx_musa);
+#endif
+	free(mem);
+	memset(this, 0, sizeof(*this));
+}
 
 md::~md()
 {
@@ -594,6 +751,7 @@ int md::load(char *name)
 	// Plug it into the memory map
 	plug_in(temp, size); // md then deallocates it when it's done
 
+  fprintf(stderr,"rom country code(s) %s\n", cart_head.countries);
 	return 0;
 }
 

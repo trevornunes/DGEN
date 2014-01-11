@@ -203,11 +203,24 @@ void SN76496_set_clock(int chip,int clock)
 }
 
 
+// Standard DGEN PSG volume calculations follow, they differ greatly from more recent ones
+// 10922,8675,6891,5473,4348,3453,2743,2179,1731,1374,1092,867,689,547,434
+
+
+static const unsigned short PSGVolumeValues[16] =
+{
+  /* These values are taken from a real SMS2's output */
+  /*{892,892,892,760,623,497,404,323,257,198,159,123,96,75,60,0}, */
+  /* I can't remember why 892... :P some scaling I did at some point */
+  /* these values are true volumes for 2dB drops at each step (multiply previous by 10^-0.1) */
+  1516,1205,957,760,603,479,381,303,240,191,152,120,96,76,60,0
+};
 
 static void SN76496_set_volume(int chip,int volume,int gain)
 {
     struct SN76496 *R = &sn[chip];
     int i;
+#ifdef OLD_WAY
     double out;
 
     (void)volume;
@@ -220,17 +233,26 @@ static void SN76496_set_volume(int chip,int volume,int gain)
     out = MAX_OUTPUT / 3;
     while (gain-- > 0)
         out *= 1.023292992; /* = (10 ^ (0.2/20)) */
+#endif
 
-    /* build volume table (2dB per step) */
+    // memcpy(R->VolTable[0], PSGVolumeValues[0], 15);
     for (i = 0;i < 15;i++)
     {
-        /* limit volume to avoid clipping */
-        if (out > MAX_OUTPUT / 3) R->VolTable[i] = MAX_OUTPUT / 3;
+       R->VolTable[i] = PSGVolumeValues[i];
+    }
+
+#ifdef OLD_WAY
+    for(i = 0; i < 15; i++)
+    {
+       if (out > MAX_OUTPUT / 3) R->VolTable[i] = MAX_OUTPUT / 3;
         else R->VolTable[i] = out;
 
-        out /= 1.258925412; /* = 10 ^ (2/20) = 2dB */
+        out /= 1.258925412;
+        fprintf(stderr,"%d,", R->VolTable[i]);
     }
-    R->VolTable[15] = 0;
+
+   R->VolTable[15] = 0;
+#endif
 }
 
 

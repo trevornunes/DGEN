@@ -75,7 +75,6 @@ uint8_t *load_rom(size_t *rom_size, const char *name)
 		return NULL;
 	}
 
-	fprintf(stderr,"load: checking for SEGA string ...\n");
 
 	/*
 	  If "SEGA" isn't found at 0x100 and the total size minus 512 is a
@@ -116,8 +115,10 @@ uint8_t *load_rom(size_t *rom_size, const char *name)
 			return NULL;
 		}
 	}
-	if (rom_size != NULL)
+	if (rom_size != NULL) {
 		*rom_size = size;
+		fprintf(stderr,"rom loaded, size %d\n", *rom_size);
+	}
 	return rom;
 }
 

@@ -333,6 +333,7 @@ public:
   int load(char *name);
 
   int reset();
+  void recreate(int palmode,int reg);
 
 	uint8_t misc_readbyte(uint32_t a);
 	void misc_writebyte(uint32_t a, uint8_t d);

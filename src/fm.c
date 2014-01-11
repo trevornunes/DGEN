@@ -579,7 +579,7 @@ typedef struct
 	INT32	volume;		/* envelope counter	*/
 	UINT32	sl;			/* sustain level:sl_table[SL] */
 	UINT32	vol_out;	/* current output from EG circuit (without AM from LFO) */
-	
+
 	UINT8	eg_sh_ar;	/*  (attack state) */
 	UINT8	eg_sel_ar;	/*  (attack state) */
 	UINT8	eg_sh_d1r;	/*  (decay state) */
@@ -1205,7 +1205,7 @@ INLINE void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
 	{
 		/* reset SSG-EG swap flag */
 		swap_flag = 0;
-		
+
 		switch(SLOT->state)
 		{
 		case EG_ATT:		/* attack phase */
@@ -1237,7 +1237,7 @@ INLINE void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
                                                 SLOT->volume += eg_inc[SLOT->eg_sel_d1r + ((OPN->eg_cnt>>SLOT->eg_sh_d1r)&7)];
 					}
         			}
-        			
+
         			/* check transition even if no volume update: this fixes the case when SL = MIN_ATT_INDEX */
 				if ( SLOT->volume >= (INT32)(SLOT->sl) )
 				{
@@ -1920,7 +1920,7 @@ static void OPNSetPres(FM_OPN *OPN , int pres , int TimerPres, int SSGpres)
 				 i, OPN->fn_table[i]>>6,OPN->fn_table[i]>>6 );
 #endif
 	}
-	
+
 	/* maximal frequency is required for Phase overflow calculation, register size is 17 bits (Nemesis) */
 	OPN->fn_max = (UINT32)( (double)0x20000 * OPN->ST.freqbase * (1<<(FREQ_SH-10)) );
 
@@ -4742,7 +4742,7 @@ void YM2612UpdateOne(int num, INT16 *buffer, unsigned int length)
 	FM_OPN *OPN   = &(FM2612[num].OPN);
 	unsigned int i;
 	INT32 dacout  = F2612->dacout;
-	
+
 	if( (void *)F2612 != cur_chip ){
 		cur_chip = (void *)F2612;
 		State = &OPN->ST;
@@ -4788,7 +4788,7 @@ void YM2612UpdateOne(int num, INT16 *buffer, unsigned int length)
 		out_fm[3] = 0;
 		out_fm[4] = 0;
 		out_fm[5] = 0;
-		
+
 		/* calculate FM */
 		chan_calc(OPN, cch[0], 0 );
 		chan_calc(OPN, cch[1], 1 );
@@ -4830,14 +4830,14 @@ void YM2612UpdateOne(int num, INT16 *buffer, unsigned int length)
 			rt += ((out_fm[4]>>0) & OPN->pan[9]);
 			lt += ((out_fm[5]>>0) & OPN->pan[10]);
 			rt += ((out_fm[5]>>0) & OPN->pan[11]);
-			
+
 			lt >>= FINAL_SH;
 			rt >>= FINAL_SH;
 
-#if 0
+//#if 0
 			Limit( lt, MAXOUT, MINOUT );
 			Limit( rt, MAXOUT, MINOUT );
-#endif
+//#endif
 
 			#ifdef SAVE_SAMPLE
 				SAVE_ALL_CHANNELS

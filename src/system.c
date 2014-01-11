@@ -69,7 +69,9 @@ FILE *dgen_fopen(const char *dir, const char *file, unsigned int mode)
 		FILE *fd = fopen(file, fmode);
 
 		if (fd != NULL)
+		{
 			return fd;
+		}
 	}
 #ifndef __MINGW32__
 	if ((pwd == NULL) || (pwd->pw_dir == NULL))
@@ -91,7 +93,6 @@ FILE *dgen_fopen(const char *dir, const char *file, unsigned int mode)
 	if (size >= sizeof(path))
 		goto error;
 	space = (sizeof(path) - size);
-	fprintf(stderr,"dgen_fopen: path='%s'\n",path);
 
 	if (mode & (DGEN_WRITE | DGEN_APPEND))
 		mkdir(path, 0777);
@@ -108,6 +109,7 @@ FILE *dgen_fopen(const char *dir, const char *file, unsigned int mode)
 	if (size >= sizeof(path))
 		goto error;
 	file = path;
+	fprintf(stderr,"dgen_fopen: file='%s' mode='%s'\n", file, fmode);
 	return fopen(file, fmode);
 error:
 	errno = EACCES;

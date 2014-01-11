@@ -48,6 +48,10 @@ void           setRomIndex(unsigned int idx);
 bool           extensionIsValid(string ext);
 void           saveState(void);
 void           loadState(void);
+string         findRom(const char *srch);
+void           showRoms(void);
+void           sortRoms(void);
+
 
 private:
 

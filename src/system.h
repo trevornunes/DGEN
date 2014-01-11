@@ -19,12 +19,12 @@
 SYSTEM_H_BEGIN_
 
 #ifndef __MINGW32__
-#define DGEN_BASEDIR "/accounts/1000/shared/misc/dgen"
+#define DGEN_BASEDIR "."
 #define DGEN_RC "dgen.cfg"
 #define DGEN_DIRSEP "/"
 #define DGEN_DIRSEP_ALT ""
 #else
-#define DGEN_BASEDIR "DGen"
+#define DGEN_BASEDIR "/accounts/1000/shared/misc/dgen"
 #define DGEN_RC "dgen.cfg"
 #define DGEN_DIRSEP "\\"
 #define DGEN_DIRSEP_ALT "/"

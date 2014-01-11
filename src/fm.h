@@ -96,7 +96,10 @@ typedef int8_t INT8; /* signed  8bit */
 typedef int16_t INT16; /* signed 16bit */
 typedef int32_t INT32; /* signed 32bit */
 
+#ifndef INLINE
 #define INLINE static inline
+#endif
+
 
 #if (FM_SAMPLE_BITS==16)
 typedef INT16 FMSAMPLE;

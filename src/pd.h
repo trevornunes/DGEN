@@ -45,6 +45,8 @@ int pd_sound_init(long &freq, unsigned int &samples);
 void pd_sound_start();
 // Likewise, sound should pause if this function is called.
 void pd_sound_pause();
+// re-adjust audio based on video rate 60hz, 50hz
+void pd_sound_reset(int palmode);
 // This should return samples read/write indices in the buffer.
 unsigned int pd_sound_rp();
 unsigned int pd_sound_wp();
